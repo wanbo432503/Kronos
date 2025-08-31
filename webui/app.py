@@ -33,24 +33,24 @@ predictor = None
 AVAILABLE_MODELS = {
     'kronos-mini': {
         'name': 'Kronos-mini',
-        'model_id': 'NeoQuasar/Kronos-mini',
-        'tokenizer_id': 'NeoQuasar/Kronos-Tokenizer-2k',
+        'model_id': '../models/Kronos-mini',
+        'tokenizer_id': '../models/Kronos-Tokenizer-2k',
         'context_length': 2048,
         'params': '4.1M',
         'description': 'Lightweight model, suitable for fast prediction'
     },
     'kronos-small': {
         'name': 'Kronos-small',
-        'model_id': 'NeoQuasar/Kronos-small',
-        'tokenizer_id': 'NeoQuasar/Kronos-Tokenizer-base',
+        'model_id': '../models/Kronos-small',
+        'tokenizer_id': '../models/Kronos-Tokenizer-base',
         'context_length': 512,
         'params': '24.7M',
         'description': 'Small model, balanced performance and speed'
     },
     'kronos-base': {
         'name': 'Kronos-base',
-        'model_id': 'NeoQuasar/Kronos-base',
-        'tokenizer_id': 'NeoQuasar/Kronos-Tokenizer-base',
+        'model_id': '../models/Kronos-base',
+        'tokenizer_id': '../models/Kronos-Tokenizer-base',
         'context_length': 512,
         'params': '102.3M',
         'description': 'Base model, provides better prediction quality'
@@ -258,9 +258,9 @@ def create_prediction_chart(df, pred_df, lookback, pred_len, actual_df=None, his
             high=pred_df['high'],
             low=pred_df['low'],
             close=pred_df['close'],
-            name='Prediction Data (120 data points)',
-            increasing_line_color='#66BB6A',
-            decreasing_line_color='#FF7043'
+            name='Prediction Data',
+            increasing_line_color="#F50808",
+            decreasing_line_color="#08F156"
         ))
     
     # Add actual data for comparison (if exists)
@@ -291,9 +291,9 @@ def create_prediction_chart(df, pred_df, lookback, pred_len, actual_df=None, his
             high=actual_df['high'],
             low=actual_df['low'],
             close=actual_df['close'],
-            name='Actual Data (120 data points)',
-            increasing_line_color='#FF9800',
-            decreasing_line_color='#F44336'
+            name='Actual Data',
+            increasing_line_color='#26A69A',
+            decreasing_line_color='#EF5350'
         ))
     
     # Update layout
@@ -665,6 +665,17 @@ def load_model():
 @app.route('/api/available-models')
 def get_available_models():
     """Get available model list"""
+    print(f"DEBUG: /api/available-models endpoint called, MODEL_AVAILABLE={MODEL_AVAILABLE}")
+    print(f"DEBUG: Available models: {list(AVAILABLE_MODELS.keys())}")
+    
+    # Check if model directories exist
+    for model_key, model_config in AVAILABLE_MODELS.items():
+        model_path = model_config['model_id']
+        tokenizer_path = model_config['tokenizer_id']
+        model_exists = os.path.exists(model_path)
+        tokenizer_exists = os.path.exists(tokenizer_path)
+        print(f"DEBUG: Model {model_key} - model exists: {model_exists}, tokenizer exists: {tokenizer_exists}")
+    
     return jsonify({
         'models': AVAILABLE_MODELS,
         'model_available': MODEL_AVAILABLE

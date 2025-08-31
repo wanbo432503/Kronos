@@ -87,74 +87,24 @@ Forecasting with Kronos is straightforward using the `KronosPredictor` class. It
 
 Here is a step-by-step guide to making your first forecast.
 
-#### 1. Load the Tokenizer and Model
+#### 1. Downloading the Tokenizer and Model
 
 First, load a pre-trained Kronos model and its corresponding tokenizer from the Hugging Face Hub.
 
-```python
-from model import Kronos, KronosTokenizer, KronosPredictor
+If you are using git-lfs, you need to modify following schell commands.
 
-# Load from Hugging Face Hub
-tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
-model = Kronos.from_pretrained("NeoQuasar/Kronos-small")
-```
-
-#### 2. Instantiate the Predictor
-
-Create an instance of `KronosPredictor`, passing the model, tokenizer, and desired device.
-
-```python
-# Initialize the predictor
-predictor = KronosPredictor(model, tokenizer, device="cuda:0", max_context=512)
-```
-
-#### 3. Prepare Input Data
-
-The `predict` method requires three main inputs:
--   `df`: A pandas DataFrame containing the historical K-line data. It must include columns `['open', 'high', 'low', 'close']`. `volume` and `amount` are optional.
--   `x_timestamp`: A pandas Series of timestamps corresponding to the historical data in `df`.
--   `y_timestamp`: A pandas Series of timestamps for the future periods you want to predict.
-
-```python
-import pandas as pd
-
-# Load your data
-df = pd.read_csv("./data/XSHG_5min_600977.csv")
-df['timestamps'] = pd.to_datetime(df['timestamps'])
-
-# Define context window and prediction length
-lookback = 400
-pred_len = 120
-
-# Prepare inputs for the predictor
-x_df = df.loc[:lookback-1, ['open', 'high', 'low', 'close', 'volume', 'amount']]
-x_timestamp = df.loc[:lookback-1, 'timestamps']
-y_timestamp = df.loc[lookback:lookback+pred_len-1, 'timestamps']
-```
-
-#### 4. Generate Forecasts
-
-Call the `predict` method to generate forecasts. You can control the sampling process with parameters like `T`, `top_p`, and `sample_count` for probabilistic forecasting.
-
-```python
-# Generate predictions
-pred_df = predictor.predict(
-    df=x_df,
-    x_timestamp=x_timestamp,
-    y_timestamp=y_timestamp,
-    pred_len=pred_len,
-    T=1.0,          # Temperature for sampling
-    top_p=0.9,      # Nucleus sampling probability
-    sample_count=1  # Number of forecast paths to generate and average
-)
-
-print("Forecasted Data Head:")
-print(pred_df.head())
+```shell
+cd models
+git clone https://huggingface.co/NeoQuasar/Kronos-Tokenizer-2k
+git clone https://huggingface.co/NeoQuasar/Kronos-Tokenizer-base
+git clone https://huggingface.co/NeoQuasar/Kronos-mini
+git clone https://huggingface.co/NeoQuasar/Kronos-small
+git clone https://huggingface.co/NeoQuasar/Kronos-base
 ```
 
 The `predict` method returns a pandas DataFrame containing the forecasted values for `open`, `high`, `low`, `close`, `volume`, and `amount`, indexed by the `y_timestamp` you provided.
 
-#### 5. Example and Visualization
+#### 2. Example and Visualization
 
 For a complete, runnable script that includes data loading, prediction, and plotting, please see [`examples/prediction_example.py`](examples/prediction_example.py).
 
